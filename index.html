@@ -36,9 +36,9 @@
           <button id="lists" @click="listShow = true">中奖名单</button>
         </div>
         <!--抽奖音乐标签-->
-        <audio id="music" src="https://cdn-fx.nio.com/fx/neoclient/QUhty_FWaGJVzx3Qjw2WJ/04-抽奖音乐 猪突猛進.mp3" loop></audio>
+        <audio id="music" src="./music/04-抽奖音乐 猪突猛進.mp3" loop></audio>
         <!--抽奖音乐标签-->
-        <audio id="music2" src="https://cdn-fx.nio.com/fx/neoclient/eIroRxveuVhCCRGpLT-9P/9629.mp3"></audio>
+        <audio id="music2" src="./music/9629.mp3"></audio>
 
         <div class="priceLists" v-show="listShow">
           <div class="listBoxs">
@@ -372,7 +372,7 @@
       price2: [], //二等奖
       price3: [], //三等奖
       lens: [19, 14, 21], // 奖励名额  1 等奖  2 等奖  3等奖
-      // lens: [1, 2, 1],
+      // lens: [15, 2, 5],
       priceNow: "三等奖",
     },
     methods: {
@@ -411,7 +411,7 @@
         //   alert("抽完咯~~~完咯~~~咯~~~,在中奖名单中清空，再来一次？");
         //   return;
         // }
-        if (this.price1.length == this.lens[0]) {
+        if (this.price1.length >= this.lens[0]) {
           alert("抽完咯~~~完咯~~~咯~~~,在中奖名单中清空，再来一次？");
           return;
         }
@@ -453,53 +453,107 @@
         music.pause();
         this.ckPrice();
       },
+
+      checkIsIn: function (img) {
+        var res = true;
+        var allList = this.price1.concat(this.price2, this.price3);
+        res = !allList.some(function (itm) {
+          return itm.img == img;
+        });
+        return res;
+      },
       // 判断是否已经得过奖
       ckIsIn: function (img) {
         var res = true;
         var cps = "";
-        this.price3.map(function (v, i) {
-          if (v.img == img) {
-            res = false;
-          }
-        });
-        this.price2.map(function (v, i) {
-          if (v.img == img) {
-            res = false;
-          }
-        });
-        this.price1.map(function (v, i) {
-          if (v.img == img) {
-            res = false;
-          }
-        });
-        if (this.spic.img == img) {
-          res = false;
-        }
+
+        res = !(
+          this.price3.some(function (v) {
+            return v.img === img;
+          }) ||
+          this.price2.some(function (v) {
+            return v.img === img;
+          }) ||
+          this.price1.some(function (v) {
+            return v.img === img;
+          })
+        );
+        // this.price3.map(function (v, i) {
+        //   if (v.img == img) {
+        //     res = false;
+        //   }
+        // });
+        // this.price2.map(function (v, i) {
+        //   if (v.img == img) {
+        //     res = false;
+        //   }
+        // });
+        // this.price1.map(function (v, i) {
+        //   if (v.img == img) {
+        //     res = false;
+        //   }
+        // });
+        // if (this.spic.img == img) {
+        //   res = false;
+        // }
         return res;
       },
       // 储存得奖名单
       choosePerson: function () {
+        // 获取内容
         var img = document.getElementById("changeImg").src;
         var txt = document.getElementById("detailss").innerHTML;
 
+        // 拿dom
         var img2 = document.getElementById("changeImg");
         var txt2 = document.getElementById("detailss");
 
-        var isFalse = this.ckIsIn(img);
-        if (!isFalse) {
+        var isFalse = this.checkIsIn(img);
+
+        while (!isFalse) {
           //重复了···再随机一次
           var nums = Math.floor(Math.random() * tableLens);
           if (nums == tableLens) {
             nums = tableLens - 1;
           }
-          var src = table[nums * 2];
-          var txts = table[nums * 2 + 1];
 
-          img2.src = src;
-          txt2.innerHTML = txts;
-          this.choosePerson();
-          return;
+          img = table[nums * 2];
+          txt = table[nums * 2 + 1];
+
+          isFalse = this.checkIsIn(img);
         }
+
+        // do {
+        //    //重复了···再随机一次
+        //    var nums = Math.floor(Math.random() * tableLens);
+        //   if (nums == tableLens) {
+        //     nums = tableLens - 1;
+        //   }
+        //   var src = table[nums * 2];
+        //   var txts = table[nums * 2 + 1];
+        // } while(!this.checkIsIn(img))
+
+        // 没有重复 更新 dom
+
+        img2.src = img;
+        txt2.innerHTML = txt;
+
+        // if (!isFalse) {
+        //   //重复了···再随机一次
+        //   var nums = Math.floor(Math.random() * tableLens);
+        //   if (nums == tableLens) {
+        //     nums = tableLens - 1;
+        //   }
+        //   var src = table[nums * 2];
+        //   var txts = table[nums * 2 + 1];
+
+        //   img2.src = src;
+        //   txt2.innerHTML = txts;
+        //   this.choosePerson();
+
+        //   return;
+        // }
+
         var obj = {
           img: img,
           name: txt,
@@ -516,11 +570,12 @@
             if (len1 < this.lens[0]) {
               this.price1.push(obj);
             } else {
-              if (this.spic.img == "") {
-                this.spic = obj;
-              } else {
-                alert("抽完咯，完咯~~咯~~~");
-              }
+              // if (this.spic.img == "") {
+              //   this.spic = obj;
+              // } else {
+
+              // }
+              alert("抽完咯，完咯~~咯~~~");
             }
           }
         }
@@ -528,7 +583,7 @@
           this.price1,
           this.price2,
           this.price3,
-          this.spic,
+          // this.spic,
         ]);
         sessionStorage.setItem("pricesListm", json);
       },
@@ -551,7 +606,7 @@
         this.price1 = attrs[0];
         this.price2 = attrs[1];
         this.price3 = attrs[2];
-        this.spic = attrs[3];
+        // this.spic = attrs[3];
       }
       init();
       getStar();
