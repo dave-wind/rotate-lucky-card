@@ -126,7 +126,7 @@ function getData() {
     "./img/42.png",
     "沈彦珺",
 
-    "https://cdn-fx.nio.com/fx/neoclient/mKTdpNzcQg9wJryhrIa3Z/43.png",
+    "./img/43.png",
     "王德凯",
 
     "./img/44.png",
